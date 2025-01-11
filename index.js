@@ -13,7 +13,7 @@ const login = ( nameUser ) => {
         console.log("\x1b[36m", `Hello, ${ currentUser }!`);
         balance();
     }else{
-        console.error("\x1b[31m","Please logout fist");
+        errorMessage("Please logout fist");
     }
 }
 
@@ -25,6 +25,11 @@ const initDbUser = () => {
             owedFrom: []
         }
     }
+}
+
+const errorMessage = (msg) => {
+    console.error("\x1b[31m", msg);
+    console.log("\x1b[36m");
 }
 
 const logout = () => {
@@ -89,7 +94,7 @@ const withdraw = ( value ) => {
         dbUser[ currentUser ].balance -= value;
         console.log("\x1b[36m", `Withdrawed $${ value }`);
     }else{
-        console.error("\x1b[31m","Sorry, Not enough money to withdraw");
+        errorMessage("Sorry, Not enough money to withdraw");
     }
     balance();
 }
@@ -174,7 +179,7 @@ const transfer = (to, value, returnBalance=true) => {
         }
         if( returnBalance ) balance();
     }else{
-        console.error("\x1b[31m","Target transfer not found");
+        errorMessage("Target transfer not found");
     }
 }
 
@@ -189,52 +194,71 @@ cli.processInput = function (str) {
 
         switch(iCommand) {
             case 'login':
+                if(!iVal1){
+                    errorMessage("Error: username undefined");
+                    break;
+                }
+
                 login( iVal1 );
                 break;
             case 'deposit':
+                if(!iVal1){
+                    errorMessage("Error: amount undefined");
+                    break;
+                }
+
                 deposit( iVal1 );
                 break;
             case 'balance':
                 balance();
                 break;
             case 'withdraw':
+                if(!iVal1){
+                    errorMessage("Error: amount undefined");
+                    break;
+                }
+
                 withdraw( iVal1 );
                 break;
             case 'transfer':
+                if(!iVal1){
+                    errorMessage("Error: target user undefined");
+                    break;
+                }
+                if(!iVal2){
+                    errorMessage("Error: amount undefined");
+                    break;
+                }
+
                 transfer( iVal1, iVal2 );
                 break;
             case 'logout':
                 logout();
                 break;
             default:
-                console.error("\x1b[31m","Error: Command not found");
+                errorMessage("Error: Command not found");
                 break;
         }
-
-        /* if (inputs.length >= 3) {
-            var results = 0;
-            inputs.some(function (value) {
-                    if (!isNaN(value)) {
-                        results = results + parseInt(value);
-                    }
-            })
-            console.log("\x1b[36m","Total is :",results);
-            return true;
-        } else {
-            console.error("\x1b[31m","Error: Too few parameter");
-            return false;
-        } */
     }
 }
 
 cli.init = function () {
     console.log('\x1b[33m%s\x1b[0m', 'CLI is running');
+
+    console.log('\x1b[33m%s\x1b[0m', 'Example Commands:');
+    console.log('\x1b[33m%s\x1b[0m', '> login <username>');
+    console.log('\x1b[33m%s\x1b[0m', '> deposit <amount>');
+    console.log('\x1b[33m%s\x1b[0m', '> withdraw <amout>');
+    console.log('\x1b[33m%s\x1b[0m', '> transfer <target> <amount>');
+    console.log('\x1b[33m%s\x1b[0m', '> logout');
+
     /* Start the interface */
     var _interface = readline.createInterface({
             input: process.stdin,
             output: process.stdout,
             prompt: '>'
-})
+    })
+    
     /* Create an initial prompt */
     _interface.prompt(); // Will wait for input
     /* Handle each line of input separately. */
